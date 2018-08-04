@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>习讯云自动签到托管平台-自动提交自定义周报月报平台</title>
+</head>
+<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+<body>
+<div class="container">
+	<div class="row clearfix">
+		<div class="col-md-8 column" >
+
+            <form method="post" action="/loginget" style="margin-left: 150px">
+                <div class="form-group" style="margin-top: 50px">
+                    <label for="studentid">学号：</label><input id="studentid" name="studentid">
+                    <br>
+                    <label for="password">密码：</label><input id="password" name="password">
+                    <br>                    
+                    <label for="schoolid">学校代码：</label><input id="schoolid" name="schoolid" value="34">
+                    <br><br>
+                    <div class="btn btn-default" id="select" style="margin-left: 70px">查询历史</div>&nbsp;&nbsp;
+
+                </div>
+                <div id="address"></div>
+
+                <div id="choose" hidden="hidden">
+                    当前选择：<br>
+                    地址：<input id="address_choose" placeholder='请先查询后选择' name="address" style="width: 300px" disabled><br>
+                    纬度：<input id="latitude_choose" placeholder='请先查询后选择' name="latitude" disabled><br>
+                    经度：<input id="longitude_choose" placeholder='请先查询后选择' name="longitude" disabled><br><br>
+                    
+                    <br><div class="btn btn-default" id="insert" style="margin-left: 90px">设置签到</div>
+                </div><br><br><br>
+            </form>
+		</div>
+		<div class="col-md-4 column">
+            <div id="help" style="margin-top: 50px">
+                <ul>
+                    <li>
+                        请先登录查询历史最近的签到地址（如果没有的话先去地址签一次后再来查询）
+                    </li>
+                    <li>
+                        提示设置成功即可,并非立即生效
+                    </li>
+                    <li>
+                        周报月报由历代学生的内容,不一定适合任何人,建议自动周报月报后自己再审查（是可以修改的）
+                    </li>
+                </ul>
+            </div>
+		</div>
+	</div>
+</div>
+
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+    function insert() {
+        var studentid = $('#studentid').val();
+        var password = $('#password').val();
+        var address = $('#address_choose').val();
+        var latitude = $('#latitude_choose').val();
+        var longitude = $('#longitude_choose').val();
+        var schoolid = $('#schoolid').val();
+        $.post('/insert',{studentid:studentid, password:password,schoolid:schoolid, address:address, latitude:latitude, longitude:longitude}, function(data) {
+            if (data=="10000"){
+                alert('设置自动签到成功！无需重复提交！')
+            }else{
+                alert('设置自动签到失败!确保信息完整以及未设置过～')
+            }
+        });
+    }
+    $('#select').on('click',function () {
+        var studentid = $('#studentid').val();
+        var password = $('#password').val();
+        var schoolid = $('#schoolid').val();
+        $('#address').html('<lable style="color: darkseagreen;">正在登录查询...请稍等,长时间未响应的话请重试</lable><br><br>');
+        $.post('/loginget',{studentid:studentid, password:password, schoolid:schoolid}, function(data) {
+            if (data){
+                $('#address').html('<lable>以下是最近三次的签到记录,请选择：</lable><br>'+data+'<br>');
+                $('#choose').show();
+                $('#studentid').attr("disabled","disabled");
+                $('#password').attr("disabled","disabled");
+            }else{
+                $('#address').html('<lable>帐号或密码错误！如果持续错误并等待时间长请联系管理员</lable><br><br>');
+            }
+
+        });
+    });
+    $('#insert').on('click',function () {
+        if ($('#address_choose').val() == ""){
+            alert('请选择签到地址!')
+            return ""
+        }
+        insert()
+    });
+    function choose(address, latitude, longitude) {
+        $('#address_choose').val(address);
+        $('#latitude_choose').val(latitude);
+        $('#longitude_choose').val(longitude);
+    }
+</script>
+</html>
