@@ -11,8 +11,11 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-运行好后访问 ::url/start
-::url 为你的访问网址  访问上面网站后开启自动签到
+运行好后访问网址
+
+ ::url/start
+
+ ::url 为你的部署域名  访问上面网站后开启自动签到
 
 ##网站有什么功能
 
